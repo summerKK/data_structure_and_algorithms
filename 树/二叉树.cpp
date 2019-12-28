@@ -6,7 +6,7 @@ typedef char DATA_TYPE;
 // 二叉链表的结构定义
 typedef struct BiTNode {
     DATA_TYPE data;
-    struct BiTNode *lChildren, *rChildren;
+    struct BiTNode *lChild, *rChild;
 } BiTNode, *BiTree;
 
 // 前序建立一个二叉树
@@ -22,30 +22,40 @@ void CreateBiTree(BiTree *T) {
         // 给T赋值
         (*T)->data = ch;
         // 给左子树赋值
-        CreateBiTree(&(*T)->lChildren);
+        CreateBiTree(&(*T)->lChild);
         // 给右子树赋值
-        CreateBiTree(&(*T)->rChildren);
+        CreateBiTree(&(*T)->rChild);
     }
 }
 
 // 前序遍历
-void PreOrderTraverse(BiTree T) {
+void PreorderTraverse(BiTree T) {
     if (T == nullptr) {
         return;
     }
     printf("%c", T->data);
-    PreOrderTraverse(T->lChildren);
-    PreOrderTraverse(T->rChildren);
+    PreorderTraverse(T->lChild);
+    PreorderTraverse(T->rChild);
 }
 
 // 中序遍历
-void InOrderTraverse(BiTree T) {
+void InorderTraverse(BiTree T) {
     if (T == nullptr) {
         return;
     }
-    InOrderTraverse(T->lChildren);
+    InorderTraverse(T->lChild);
     printf("%c", T->data);
-    InOrderTraverse(T->rChildren);
+    InorderTraverse(T->rChild);
+}
+
+// 后序遍历
+void PostorderTraverse(BiTree T) {
+    if (T == nullptr) {
+        return;
+    }
+    PostorderTraverse(T->lChild);
+    PostorderTraverse(T->rChild);
+    printf("%c", T->data);
 }
 
 int main() {
@@ -55,13 +65,18 @@ int main() {
     // 前序简历二叉树
     CreateBiTree(&tree);
     cout << "二叉树前序输出" << endl;
-    PreOrderTraverse(tree);
+    PreorderTraverse(tree);
     cout << endl;
     cout << "二叉树前序输出" << endl;
 
     cout << "二叉树中序输出" << endl;
-    InOrderTraverse(tree);
+    InorderTraverse(tree);
     cout << endl;
     cout << "二叉树中序输出" << endl;
+
+    cout << "二叉树后序输出" << endl;
+    PostorderTraverse(tree);
+    cout << endl;
+    cout << "二叉树后序输出" << endl;
 
 }
