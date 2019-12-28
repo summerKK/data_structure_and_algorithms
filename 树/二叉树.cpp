@@ -43,9 +43,9 @@ void InOrderTraverse(BiTree T) {
     if (T == nullptr) {
         return;
     }
-    PreOrderTraverse(T->lChildren);
+    InOrderTraverse(T->lChildren);
     printf("%c", T->data);
-    PreOrderTraverse(T->rChildren);
+    InOrderTraverse(T->rChildren);
 }
 
 int main() {
