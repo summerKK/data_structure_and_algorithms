@@ -19,7 +19,11 @@ typedef struct BiTNode {
     PointerTag rflag;
 } BiTNode, *BiTree;
 
-BiTree pre = (BiTree) malloc(sizeof(BiTNode));
+BiTree pre;
+// 中序遍历第一个节点
+BiTree inorderFirst;
+// 中序遍历最后一个节点
+BiTree inorderLast;
 
 void CreateBiTree(BiTree *T) {
     char data;
@@ -43,6 +47,10 @@ void InThreading(BiTree T) {
     }
     // 查找当前节点左节点
     InThreading(T->lChild);
+    if (inorderFirst == nullptr) {
+        inorderFirst = T;
+    }
+    inorderLast = T;
     // 中序遍历最开始查找的节点是最做叶子节点,所在判断 lChild,rChild的程序要在 InThreading(T->lChild);和InThreading(T->rChild);之间
     if (T->lChild == nullptr) {
         // 当程序第一次走到这的时候,T表示的是最左叶子节点,它的前趋节点为null
@@ -51,8 +59,8 @@ void InThreading(BiTree T) {
     }
     // !!注意 这里判断的是前趋节点 pre,pre是上一层的节点.
     // 判断上一层的右子节点是否为null,如果为null把rChild指向当前节点(前趋节点)
-    if (pre->rChild == nullptr) {
-        pre->lflag = Thread;
+    if (pre != nullptr && pre->rChild == nullptr) {
+        pre->rflag = Thread;
         pre->rChild = T;
     }
     // 把当前节点赋值给 pre,以供下次使用
@@ -60,16 +68,24 @@ void InThreading(BiTree T) {
     InThreading(T->rChild);
 }
 
-void InorderTraverse(BiTree T) {
-    if (T == nullptr) {
-        return;
-    }
-    if (T->lflag == Link) {
-        InorderTraverse(T->lChild);
-    }
-    printf("%c", T->data);
-    if (T->rflag == Link) {
-        InorderTraverse(T->rChild);
+void InorderTraverse_Thr(BiTree T) {
+    // T是头节点
+    BiTree P = T->lChild;
+    while (T != P) {
+        // while循环找出左叶子节点
+        while (P->lflag == Link) {
+            P = P->lChild;
+        }
+        // 输出数据
+        cout << P->data;
+        // 当 P->rflag == Thread的时候代码当前节点有后继节点
+        while (P->rflag == Thread && P->rChild != T) {
+            // 把T赋值给后继节点
+            P = P->rChild;
+            cout << P->data;
+        }
+        // 上面 while (P->rflag == Thread) 的结束条件为: while (P->rflag == Link),此时把T赋值给右子节点
+        P = P->rChild;
     }
 }
 
@@ -81,9 +97,24 @@ int main() {
     InThreading(tree);
     cout << "中序遍历进行中序线索化" << endl;
 
-    cout << "二叉树中序输出" << endl;
-    InorderTraverse(tree);
+    cout << "中序遍历第一个节点:" << inorderFirst->data << endl;
+    cout << "中序遍历最后一个节点:" << inorderLast->data << endl;
+
+    // 添加头节点
+    BiTree head = (BiTree) malloc(sizeof(BiTNode));
+    // head的lflag指向第一个节点,rflag指向最后一个节点
+    head->lflag = Link;
+    head->rflag = Thread;
+    head->rChild = inorderLast;
+    head->lChild = tree;
+    inorderFirst->lChild = head;
+    inorderFirst->lflag = Thread;
+    inorderLast->rChild = head;
+    inorderLast->rflag = Thread;
+
+    cout << "中序遍历二叉线索树" << endl;
+    InorderTraverse_Thr(head);
     cout << endl;
-    cout << "二叉树中序输出" << endl;
+    cout << "中序遍历二叉线索树" << endl;
 }
 
