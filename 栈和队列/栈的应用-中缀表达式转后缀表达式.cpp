@@ -181,6 +181,38 @@ void CTPostExp(CirQueue *Q) {
     } while (s != '#');
 }
 
+// 后缀表达式计算
+int CPostExp(CirQueue Q) {
+    StackList list = InitStack();
+    DATA_TYPE ch;
+    int x, y;
+    while (!CirQueueEmpty(&Q)) {
+        ch = DeCirQueue(&Q);
+        if (ch >= '0' && ch <= '9') {
+            // ch - '0' 转换为数字
+            Push(list, ch - '0');
+        } else {
+            y = Pop(list);
+            x = Pop(list);
+            switch (ch) {
+                case '*':
+                    Push(list, y * x);
+                    break;
+                case '/':
+                    Push(list, x / y);
+                    break;
+                case '-':
+                    Push(list, x - y);
+                    break;
+                case '+':
+                    Push(list, x + y);
+                    break;
+            }
+        }
+    }
+    return GetStackTop(list);
+}
+
 int main() {
     StackList head0 = InitStack();
     StackList head1 = InitStack();
@@ -207,9 +239,8 @@ int main() {
     DATA_TYPE t;
     // 9-(2+4*7)/5+3#
     CTPostExp(&queue1);
-    while (!CirQueueEmpty(&queue1)) {
-        cout << DeCirQueue(&queue1);
-    }
+    int result = CPostExp(queue1);
+    cout << result << endl;
 }
 
 
